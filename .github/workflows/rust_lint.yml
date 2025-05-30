@@ -32,11 +32,12 @@ jobs:
     - name: Cache Rust dependencies
       uses: Swatinem/rust-cache@v2
       with:
+        workspaces: |
+          ./eth2near
         cache-on-failure: true
         cache-all-crates: true
 
     - name: Run linters
       run: cargo clippy --all-targets --all-features -- -D warnings -D clippy::all
-      
     - name: Check formatting
       run: cargo fmt --all -- --check
