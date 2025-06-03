@@ -31,25 +31,6 @@ arr_ethereum_types_wrapper_impl_borsh_serde_ssz!(H512, 64);
 arr_ethereum_types_wrapper_impl_borsh_serde_ssz!(H520, 65);
 arr_ethereum_types_wrapper_impl_borsh_serde_ssz!(Bloom, 256);
 
-#[cfg(feature = "eth2")]
-impl TreeHash for H256 {
-    fn tree_hash_type() -> TreeHashType {
-        TreeHashType::Vector
-    }
-
-    fn tree_hash_packed_encoding(&self) -> PackedEncoding {
-        PackedEncoding::from_slice(self.0.as_bytes())
-    }
-
-    fn tree_hash_packing_factor() -> usize {
-        1
-    }
-
-    fn tree_hash_root(&self) -> tree_hash::Hash256 {
-        (*self).0 .0.into()
-    }
-}
-
 macro_rules! uint_declare_wrapper_and_serde {
     ($name: ident, $len: expr) => {
         #[derive(
@@ -129,6 +110,32 @@ macro_rules! uint_declare_wrapper_and_serde {
         impl RlpDecodable for $name {
             fn decode(rlp: &Rlp) -> Result<Self, RlpDecoderError> {
                 Ok($name(<ethereum_types::$name>::decode(rlp)?))
+            }
+        }
+
+        impl From<Vec<u8>> for $name {
+            fn from(bytes: Vec<u8>) -> Self {
+                Self(ethereum_types::$name::from_big_endian(&bytes))
+            }
+        }
+
+        impl From<&[u8]> for $name {
+            fn from(bytes: &[u8]) -> Self {
+                Self(ethereum_types::$name::from_big_endian(bytes))
+            }
+        }
+
+        impl $name {
+            /// Create from big-endian bytes
+            pub fn from_bytes(bytes: &[u8]) -> Self {
+                Self(ethereum_types::$name::from_big_endian(bytes))
+            }
+
+            /// Convert to big-endian byte vector
+            pub fn to_bytes(&self) -> Vec<u8> {
+                let mut bytes = vec![0u8; $len * 8];
+                self.0.to_big_endian(&mut bytes);
+                bytes
             }
         }
     };
