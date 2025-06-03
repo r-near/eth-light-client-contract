@@ -4,6 +4,8 @@ use eth_types::H256;
 use near_sdk::near;
 use near_sdk::AccountId;
 
+use crate::consensus::Network;
+
 /// Minimal information about a header.
 #[derive(Clone)]
 #[near(serializers=[borsh])]
@@ -16,7 +18,7 @@ pub struct ExecutionHeaderInfo {
 #[derive(Clone)]
 #[near(serializers=[borsh])]
 pub struct InitInput {
-    pub network: String,
+    pub network: Network,
     pub finalized_execution_header: eth_types::BlockHeader,
     pub finalized_beacon_header: FinalizedHeader,
     pub current_sync_committee: SyncCommittee,
