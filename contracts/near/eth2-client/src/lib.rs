@@ -466,6 +466,7 @@ impl Eth2Client {
         // to match the finalized checkpoint root saved in the state of `attested_header`.
         let generalized_index =
             config.get_generalized_index_constants(update.finalized_header.beacon.slot);
+        near_sdk::env::log_str(&format!("Generalized index: {:#?}", generalized_index));
         require!(
             verify_merkle_proof(
                 H256(update.finalized_header.beacon.tree_hash_root().0.into()),
@@ -488,17 +489,14 @@ impl Eth2Client {
             let generalized_index =
                 config.get_generalized_index_constants(update.attested_header.beacon.slot);
 
+            let sync_committee_update = update
+                .next_sync_committee
+                .as_ref()
+                .unwrap_or_else(|| env::panic_str("The sync committee update is missed"));
+
             require!(
                 verify_merkle_proof(
-                    H256(
-                        update
-                            .next_sync_committee
-                            .clone()
-                            .unwrap()
-                            .tree_hash_root()
-                            .0
-                            .into()
-                    ),
+                    H256(sync_committee_update.tree_hash_root().0.into()),
                     &update.next_sync_committee_branch.clone().unwrap(),
                     generalized_index
                         .sync_committee_tree_depth
