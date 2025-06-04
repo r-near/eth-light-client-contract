@@ -35,7 +35,7 @@ pub struct GeneralizedIndex {
     pub sync_committee_tree_index: u32,
 }
 
-#[derive(PartialEq, BorshSerialize, BorshDeserialize, BorshSchema, Debug)]
+#[derive(PartialEq, BorshSerialize, BorshDeserialize, BorshSchema, Debug, Clone)]
 pub enum Network {
     Mainnet,
     Goerli,
